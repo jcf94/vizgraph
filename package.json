@@ -22,7 +22,7 @@
     "appId": "com.jcf94.vizgraph",
     "productName": "vizgraph",
     "win": {
-        "target": "portable"
+      "target": "portable"
     }
   }
 }
