@@ -1,19 +1,19 @@
 require('svg-pan-zoom');
-var Viz = require('viz.js');
+let Viz = require('viz.js');
 
-var beforeUnloadMessage = null;
-var resizeEvent = new Event("paneresize");
-var parser = new DOMParser();
-var worker;
-var result;
-
+let beforeUnloadMessage = null;
+let resizeEvent = new Event("paneresize");
+let parser = new DOMParser();
+let worker;
+let result;
+let image;
 // ------- Split -------
 
-var Split = require('split.js');
+let Split = require('split.js');
 Split(['#editor', '#graph'], {
     sizes: [40, 60],
     onDragEnd: function() {
-        var svgOutput = document.getElementById("svg_output");
+        let svgOutput = document.getElementById("svg_output");
         if (svgOutput != null) {
         svgOutput.dispatchEvent(resizeEvent);
         }
@@ -22,7 +22,7 @@ Split(['#editor', '#graph'], {
 
 // ------- Ace Editor -------
 
-var editor = ace.edit("editor");
+let editor = ace.edit("editor");
 //editor.setTheme("ace/theme/monokai");
 document.getElementById('editor').style.fontSize='12px';
 editor.getSession().setMode("ace/mode/dot");
@@ -38,10 +38,64 @@ window.addEventListener("beforeunload", function(e) {
 });
 
 document.querySelector("#engine select").addEventListener("change", function() {
+    last_engin = document.querySelector("#engine select").value;
     updateGraph();
 });
 
+let svg_button = document.querySelector('button#save_svg');
+let png_button = document.querySelector('button#save_png');
+let json_button = document.querySelector('button#save_json');
+let xdot_button = document.querySelector('button#save_xdot');
+let plain_button = document.querySelector('button#save_plain');
+let ps_button = document.querySelector('button#save_ps');
+
 document.querySelector("#format select").addEventListener("change", function() {
+    let now_format = document.querySelector("#format select").value;
+
+    if (now_format === "svg") {
+        svg_button.style.display = "inline-block";
+        png_button.style.display = "none";
+        json_button.style.display = "none";
+        xdot_button.style.display = "none";
+        plain_button.style.display = "none";
+        ps_button.style.display = "none";
+    } else if (now_format === "png-image-element") {
+        svg_button.style.display = "none";
+        png_button.style.display = "inline-block";
+        json_button.style.display = "none";
+        xdot_button.style.display = "none";
+        plain_button.style.display = "none";
+        ps_button.style.display = "none";
+    } else if (now_format === "json") {
+        svg_button.style.display = "none";
+        png_button.style.display = "none";
+        json_button.style.display = "inline-block";
+        xdot_button.style.display = "none";
+        plain_button.style.display = "none";
+        ps_button.style.display = "none";
+    } else if (now_format === "xdot") {
+        svg_button.style.display = "none";
+        png_button.style.display = "none";
+        json_button.style.display = "none";
+        xdot_button.style.display = "inline-block";
+        plain_button.style.display = "none";
+        ps_button.style.display = "none";
+    } else if (now_format === "plain") {
+        svg_button.style.display = "none";
+        png_button.style.display = "none";
+        json_button.style.display = "none";
+        xdot_button.style.display = "none";
+        plain_button.style.display = "inline-block";
+        ps_button.style.display = "none";
+    } else if (now_format === "ps") {
+        svg_button.style.display = "none";
+        png_button.style.display = "none";
+        json_button.style.display = "none";
+        xdot_button.style.display = "none";
+        plain_button.style.display = "none";
+        ps_button.style.display = "inline-block";
+    }
+
     // if (document.querySelector("#format select").value === "svg") {
     //     document.querySelector("#raw").classList.remove("disabled");
     //     document.querySelector("#raw input").disabled = false;
@@ -49,7 +103,6 @@ document.querySelector("#format select").addEventListener("change", function() {
     //     document.querySelector("#raw").classList.add("disabled");
     //     document.querySelector("#raw input").disabled = true;
     // }
-
     updateGraph();
 });
 
@@ -57,17 +110,49 @@ document.querySelector("#format select").addEventListener("change", function() {
 //     updateOutput();
 // });
 
-document.querySelector('#save_svg').addEventListener("click", function() {
-    var url = window.URL.createObjectURL(new Blob([result], { "type" : "text\/xml" }));
+function download_blod(format) {
+    let url = window.URL.createObjectURL(new Blob([result], { "type" : "text\/xml" }));
 
-    var a = document.createElement("a");
+    let a = document.createElement("a");
     document.body.appendChild(a);
     a.setAttribute("class", "svg-crowbar");
-    a.setAttribute("download", "new_graph.svg");
+    a.setAttribute("download", "new_graph." + format);
     a.setAttribute("href", url);
     a.style["display"] = "none";
     a.click();
-})
+    document.body.removeChild(a);
+};
+
+svg_button.addEventListener("click", function() {
+    download_blod("svg");
+});
+
+png_button.addEventListener("click", function() {
+    let a = document.createElement("a");
+    document.body.appendChild(a);
+    a.setAttribute("class", "svg-crowbar");
+    a.setAttribute("download", "new_graph.png");
+    a.setAttribute("href", image.src);
+    a.style["display"] = "none";
+    a.click();
+    document.body.removeChild(a);
+});
+
+json_button.addEventListener("click", function() {
+    download_blod("json");
+});
+
+xdot_button.addEventListener("click", function() {
+    download_blod("xdot");
+});
+
+plain_button.addEventListener("click", function() {
+    download_blod("plain");
+});
+
+ps_button.addEventListener("click", function() {
+    download_blod("ps");
+});
 
 // ------- Key Function -------
 
@@ -95,9 +180,9 @@ function updateGraph()
         document.querySelector("#output").classList.remove("working");
         document.querySelector("#output").classList.add("error");
 
-        var message = e.message === undefined ? "An error occurred while processing the graph input." : e.message;
+        let message = e.message === undefined ? "An error occurred while processing the graph input." : e.message;
 
-        var error = document.querySelector("#error");
+        let error = document.querySelector("#error");
         while (error.firstChild) {
             error.removeChild(error.firstChild);
         }
@@ -108,7 +193,7 @@ function updateGraph()
         e.preventDefault();
     }
 
-    var params = {
+    let params = {
         src: editor.getSession().getDocument().getValue(),
         options: {
             engine: document.querySelector("#engine select").value,
@@ -128,19 +213,19 @@ function updateGraph()
 
 function updateOutput()
 {
-    var graph = document.querySelector("#output");
+    let graph = document.querySelector("#output");
 
-    var svg = graph.querySelector("svg");
+    let svg = graph.querySelector("svg");
     if (svg) {
         graph.removeChild(svg);
     }
 
-    var text = graph.querySelector("#text");
+    let text = graph.querySelector("#text");
     if (text) {
         graph.removeChild(text);
     }
 
-    var img = graph.querySelector("img");
+    let img = graph.querySelector("img");
     if (img) {
         graph.removeChild(img);
     }
@@ -150,7 +235,7 @@ function updateOutput()
     }
 
     if (document.querySelector("#format select").value == "svg") { //&& !document.querySelector("#raw input").checked) {
-        var svg = parser.parseFromString(result, "image/svg+xml").documentElement;
+        let svg = parser.parseFromString(result, "image/svg+xml").documentElement;
         svg.id = "svg_output";
         graph.appendChild(svg);
 
@@ -170,10 +255,10 @@ function updateOutput()
             panZoom.resize();
         });
     } else if (document.querySelector("#format select").value == "png-image-element") {
-        var image = Viz.svgXmlToPngImageElement(result);
+        image = Viz.svgXmlToPngImageElement(result);
         graph.appendChild(image);
     } else {
-        var text = document.createElement("div");
+        let text = document.createElement("div");
         text.id = "text";
         text.appendChild(document.createTextNode(result));
         graph.appendChild(text);
