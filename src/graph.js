@@ -42,20 +42,20 @@ document.querySelector("#engine select").addEventListener("change", function() {
 });
 
 document.querySelector("#format select").addEventListener("change", function() {
-    if (document.querySelector("#format select").value === "svg") {
-        document.querySelector("#raw").classList.remove("disabled");
-        document.querySelector("#raw input").disabled = false;
-    } else {
-        document.querySelector("#raw").classList.add("disabled");
-        document.querySelector("#raw input").disabled = true;
-    }
+    // if (document.querySelector("#format select").value === "svg") {
+    //     document.querySelector("#raw").classList.remove("disabled");
+    //     document.querySelector("#raw input").disabled = false;
+    // } else {
+    //     document.querySelector("#raw").classList.add("disabled");
+    //     document.querySelector("#raw input").disabled = true;
+    // }
 
     updateGraph();
 });
 
-document.querySelector("#raw input").addEventListener("change", function() {
-    updateOutput();
-});
+// document.querySelector("#raw input").addEventListener("change", function() {
+//     updateOutput();
+// });
 
 document.querySelector('#save_svg').addEventListener("click", function() {
     var url = window.URL.createObjectURL(new Blob([result], { "type" : "text\/xml" }));
@@ -149,7 +149,7 @@ function updateOutput()
         return;
     }
 
-    if (document.querySelector("#format select").value == "svg" && !document.querySelector("#raw input").checked) {
+    if (document.querySelector("#format select").value == "svg") { //&& !document.querySelector("#raw input").checked) {
         var svg = parser.parseFromString(result, "image/svg+xml").documentElement;
         svg.id = "svg_output";
         graph.appendChild(svg);
@@ -165,6 +165,7 @@ function updateOutput()
         svg.addEventListener('paneresize', function(e) {
             panZoom.resize();
         }, false);
+
         window.addEventListener('resize', function(e) {
             panZoom.resize();
         });
