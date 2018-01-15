@@ -1,0 +1,21 @@
+{
+  "name": "vizgraph",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jcf94",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "1.7.10"
+  },
+  "dependencies": {
+    "ace-builds": "^1.2.9",
+    "split.js": "^1.3.5",
+    "svg-pan-zoom": "^3.5.3",
+    "viz.js": "^1.8.0"
+  }
+}
