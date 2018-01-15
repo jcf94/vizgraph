@@ -5,12 +5,15 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "packexe": "electron-packager ./ vizgraph --win --out out --arch=x64 --version 0.0.1 --overwrite --ignore=node_modules",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jcf94",
   "license": "ISC",
   "devDependencies": {
-    "electron": "1.7.10"
+    "electron": "1.7.10",
+    "electron-packager": "^10.1.1",
+    "electron-winstaller": "^2.6.3"
   },
   "dependencies": {
     "ace-builds": "^1.2.9",
