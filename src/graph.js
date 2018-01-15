@@ -113,10 +113,12 @@ document.querySelector("#format select").addEventListener("change", function() {
 function download_blod(format) {
     let url = window.URL.createObjectURL(new Blob([result], { "type" : "text\/xml" }));
 
+    let pre = document.querySelector("#engine select").value;
+
     let a = document.createElement("a");
     document.body.appendChild(a);
     a.setAttribute("class", "svg-crowbar");
-    a.setAttribute("download", "new_graph." + format);
+    a.setAttribute("download", pre + "_graph." + format);
     a.setAttribute("href", url);
     a.style["display"] = "none";
     a.click();
@@ -128,10 +130,12 @@ svg_button.addEventListener("click", function() {
 });
 
 png_button.addEventListener("click", function() {
+    let pre = document.querySelector("#engine select").value;
+
     let a = document.createElement("a");
     document.body.appendChild(a);
     a.setAttribute("class", "svg-crowbar");
-    a.setAttribute("download", "new_graph.png");
+    a.setAttribute("download", pre + "_graph.png");
     a.setAttribute("href", image.src);
     a.style["display"] = "none";
     a.click();
