@@ -36,8 +36,8 @@ editor.getSession().setMode("ace/mode/dot");
 editor.on("change", function() {
     if (!edit_state) {
         edit_state = true;
-        let window = BrowserWindow.getFocusedWindow();
-        window.setTitle(window.getTitle()+'(*)');
+        let window = BrowserWindow.getAllWindows()[0];
+        window.setTitle('VizGraph (*)');
     }
     updateGraph();
     beforeUnloadMessage = "Your changes will not be saved.";
@@ -283,25 +283,120 @@ function updateOutput()
 
 // ------- Menu -------
 
-function save_dot_to_file() {
+let save_dot_to_file = (callback, args) => {
     let dot_text = editor.getSession().getDocument().getValue();
     dialog.showSaveDialog({
         filters: [
             {name: 'Dot Files', extensions: ['dot']},
             {name: 'All Files', extensions: ['*']}
-        ]
-    }, (filename) => {
-        if (filename === undefined){
-            console.log("File Save canceled.");
-            return;
-        }
-        fs.writeFile(filename, dot_text, (err) => {
-            if (err) {
-                alert("An error ocurred creating the file "+ err.message);
+        ]}, (filename) => {
+            if (filename === undefined){
+                console.log("File Save canceled.");
+                return;
             }
-        });
+            fs.writeFile(filename, dot_text, (err) => {
+                if (err) {
+                    alert("An error ocurred creating the file "+ err.message);
+                    return;
+                }
+                edit_state = false;
+                let window = BrowserWindow.getAllWindows()[0];
+                window.setTitle('VizGraph');
+                current_file = filename;
+            });
+
+            callback && callback(args);
     });
 }
+
+let try_to_save_dot_to_file = (callback, args) => {
+    if (edit_state) {
+        if (current_file === undefined) {
+            save_dot_to_file(callback, args);
+        } else {
+            let dot_text = editor.getSession().getDocument().getValue();
+            fs.writeFile(current_file, dot_text, (err) => {
+                if (err) {
+                    alert("An error ocurred creating the file "+ err.message);
+                    return;
+                }
+                edit_state = false;
+                let window = BrowserWindow.getAllWindows()[0];
+                window.setTitle('VizGraph');
+            });
+            callback && callback(args);
+        }
+    }
+}
+
+let read_file = (filename) => {
+    if (filename === undefined) {
+        console.log("No file selected.");
+        return;
+    }
+    current_file = filename;
+    fs.readFile(current_file, 'utf-8', (err, data) => {
+        if (err) {
+            alert("An error ocurred reading the file :" + err.message);
+            return;
+        }
+        let dot_text = editor.getSession().getDocument().setValue(data);
+        edit_state = false;
+        let window = BrowserWindow.getAllWindows()[0];
+        window.setTitle('VizGraph');
+    });
+}
+
+let read_dot_from_file = (filepath) => {
+    if (filepath === undefined) {
+        dialog.showOpenDialog({
+            filters: [
+                {name: 'Dot Files', extensions: ['dot']},
+                {name: 'All Files', extensions: ['*']}
+            ]}, (filename) => {
+                    read_file(filename[0]);
+        });
+    } else {
+        read_file(filepath);
+    }
+}
+
+let try_to_read_dot_from_file = (filepath) => {
+    if (edit_state) {
+        dialog.showMessageBox({
+            type: "question",
+            message: "Save Current Dot File & Open another?",
+            buttons: ["Yes", "No", "Cancel"],
+            title: "Save Dot File"
+        }, (response) => {
+            switch(response) {
+                case 0:
+                    try_to_save_dot_to_file(read_dot_from_file, filepath);
+                    break;
+                case 1:
+                    read_dot_from_file(filepath);
+                    break;
+                default:
+                    return;
+            }
+        });
+    } else {
+        read_dot_from_file(filepath);
+    }
+}
+
+document.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    console.log(e.dataTransfer.files[0].path);
+    try_to_read_dot_from_file(e.dataTransfer.files[0].path);
+});
+
+document.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+});
 
 let menutemplate = [
     {
@@ -310,49 +405,20 @@ let menutemplate = [
             {
                 label: 'Open Dot File',
                 click: () => {
-                    dialog.showOpenDialog((filename) => {
-                        if (filename === undefined) {
-                            console.log("No file selected.");
-                            return;
-                        }
-                        current_file = filename[0];
-                        fs.readFile(current_file, 'utf-8', (err, data) => {
-                            if (err) {
-                                alert("An error ocurred reading the file :" + err.message);
-                                return;
-                            }
-                            let dot_text = editor.getSession().getDocument().setValue(data);
-                        });
-                    });
+                    try_to_read_dot_from_file();
                 }
             },
             {
                 label: 'Save Dot File',
+                accelerator: 'Ctrl+S',
                 click: () => {
-                    if (edit_state) {
-                        if (current_file === undefined) {
-                            save_dot_to_file()
-                        } else {
-                            let dot_text = editor.getSession().getDocument().getValue();
-                            fs.writeFile(current_file, dot_text, (err) => {
-                                if (err) {
-                                    alert("An error ocurred creating the file "+ err.message);
-                                }
-                            });
-                        }
-                        edit_state = false;
-                        let window = BrowserWindow.getFocusedWindow();
-                        window.setTitle(window.getTitle()-'(*)');
-                    }
+                    try_to_save_dot_to_file();
                 }
             },
             {
                 label: 'Save Dot File to ...',
                 click: () => {
                     save_dot_to_file()
-                    edit_state = false;
-                    let window = BrowserWindow.getFocusedWindow();
-                    window.setTitle(window.getTitle()-'(*)');
                 }
             },
             { type: 'separator' },
@@ -373,7 +439,7 @@ let menutemplate = [
         label: 'View',
         submenu: [
             //{role: 'reload'},
-            {role: 'forcereload'},
+            //{role: 'forcereload'},
             //{role: 'toggledevtools'},
             //{type: 'separator'},
             //{role: 'resetzoom'},
