@@ -7,7 +7,14 @@
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Jcf94",
+  "author": {
+      "name": "Jcf94",
+      "email": "jcf94@outlook.com"
+  },
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/jcf94/vizgraph.git"
+  },
   "license": "ISC",
   "devDependencies": {
     "electron": "1.7.10"
@@ -22,7 +29,11 @@
     "appId": "com.jcf94.vizgraph",
     "productName": "vizgraph",
     "win": {
-      "target": "portable"
+      "target": {
+          "target": "portable",
+          "arch": "ia32"
+        },
+      "publisherName": "Jcf94"
     }
   }
 }
