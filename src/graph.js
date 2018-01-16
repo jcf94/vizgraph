@@ -7,6 +7,12 @@ let parser = new DOMParser();
 let worker;
 let result;
 let image;
+
+const {Menu, dialog, BrowserWindow} = require('electron').remote;
+let fs = require('fs');
+
+let edit_state = false;
+let current_file = undefined;
 // ------- Split -------
 
 let Split = require('split.js');
@@ -28,6 +34,11 @@ let editor = ace.edit("editor");
 editor.getSession().setMode("ace/mode/dot");
 //editor.execCommand("showSettingsMenu");
 editor.on("change", function() {
+    if (!edit_state) {
+        edit_state = true;
+        let window = BrowserWindow.getFocusedWindow();
+        window.setTitle(window.getTitle()+'(*)');
+    }
     updateGraph();
     beforeUnloadMessage = "Your changes will not be saved.";
 });
@@ -272,9 +283,25 @@ function updateOutput()
 
 // ------- Menu -------
 
-const {Menu, dialog} = require('electron').remote;
-
-let fs = require('fs');
+function save_dot_to_file() {
+    let dot_text = editor.getSession().getDocument().getValue();
+    dialog.showSaveDialog({
+        filters: [
+            {name: 'Dot Files', extensions: ['dot']},
+            {name: 'All Files', extensions: ['*']}
+        ]
+    }, (filename) => {
+        if (filename === undefined){
+            console.log("File Save canceled.");
+            return;
+        }
+        fs.writeFile(filename, dot_text, (err) => {
+            if (err) {
+                alert("An error ocurred creating the file "+ err.message);
+            }
+        });
+    });
+}
 
 let menutemplate = [
     {
@@ -288,7 +315,8 @@ let menutemplate = [
                             console.log("No file selected.");
                             return;
                         }
-                        fs.readFile(filename[0], 'utf-8', (err, data) => {
+                        current_file = filename[0];
+                        fs.readFile(current_file, 'utf-8', (err, data) => {
                             if (err) {
                                 alert("An error ocurred reading the file :" + err.message);
                                 return;
@@ -300,27 +328,31 @@ let menutemplate = [
             },
             {
                 label: 'Save Dot File',
+                click: () => {
+                    if (edit_state) {
+                        if (current_file === undefined) {
+                            save_dot_to_file()
+                        } else {
+                            let dot_text = editor.getSession().getDocument().getValue();
+                            fs.writeFile(current_file, dot_text, (err) => {
+                                if (err) {
+                                    alert("An error ocurred creating the file "+ err.message);
+                                }
+                            });
+                        }
+                        edit_state = false;
+                        let window = BrowserWindow.getFocusedWindow();
+                        window.setTitle(window.getTitle()-'(*)');
+                    }
+                }
             },
             {
                 label: 'Save Dot File to ...',
                 click: () => {
-                    let dot_text = editor.getSession().getDocument().getValue();
-                    dialog.showSaveDialog({
-                        filters: [
-                            {name: 'Dot Files', extensions: ['dot']},
-                            {name: 'All Files', extensions: ['*']}
-                        ]
-                    }, (filename) => {
-                        if (filename === undefined){
-                            console.log("File Save canceled.");
-                            return;
-                        }
-                        fs.writeFile(filename, dot_text, (err) => {
-                            if (err) {
-                                alert("An error ocurred creating the file "+ err.message);
-                            }
-                        });
-                    });
+                    save_dot_to_file()
+                    edit_state = false;
+                    let window = BrowserWindow.getFocusedWindow();
+                    window.setTitle(window.getTitle()-'(*)');
                 }
             },
             { type: 'separator' },
