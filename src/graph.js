@@ -24,8 +24,9 @@ Split(['#editor', '#graph'], {
 
 let editor = ace.edit("editor");
 //editor.setTheme("ace/theme/monokai");
-document.getElementById('editor').style.fontSize='12px';
+//document.getElementById('editor').style.fontSize='20px';
 editor.getSession().setMode("ace/mode/dot");
+//editor.execCommand("showSettingsMenu");
 editor.on("change", function() {
     updateGraph();
     beforeUnloadMessage = "Your changes will not be saved.";
@@ -268,5 +269,101 @@ function updateOutput()
         graph.appendChild(text);
     }
 }
+
+// ------- Menu -------
+
+const {Menu, dialog} = require('electron').remote;
+
+let fs = require('fs');
+
+let menutemplate = [
+    {
+        label: 'File',
+        submenu: [
+            {
+                label: 'Open Dot File',
+                click: () => {
+                    dialog.showOpenDialog((filename) => {
+                        if (filename === undefined) {
+                            console.log("No file selected.");
+                            return;
+                        }
+                        fs.readFile(filename[0], 'utf-8', (err, data) => {
+                            if (err) {
+                                alert("An error ocurred reading the file :" + err.message);
+                                return;
+                            }
+                            let dot_text = editor.getSession().getDocument().setValue(data);
+                        });
+                    });
+                }
+            },
+            {
+                label: 'Save Dot File',
+            },
+            {
+                label: 'Save Dot File to ...',
+                click: () => {
+                    let dot_text = editor.getSession().getDocument().getValue();
+                    dialog.showSaveDialog({
+                        filters: [
+                            {name: 'Dot Files', extensions: ['dot']},
+                            {name: 'All Files', extensions: ['*']}
+                        ]
+                    }, (filename) => {
+                        if (filename === undefined){
+                            console.log("File Save canceled.");
+                            return;
+                        }
+                        fs.writeFile(filename, dot_text, (err) => {
+                            if (err) {
+                                alert("An error ocurred creating the file "+ err.message);
+                            }
+                        });
+                    });
+                }
+            },
+            { type: 'separator' },
+            {
+                label: 'Editor Setting',
+                click: () => {
+                    editor.execCommand("showSettingsMenu");
+                }
+            },
+            { type: 'separator' },
+            { role: 'quit' }
+        ]
+    },
+    {
+        role: 'editMenu'
+    },
+    {
+        label: 'View',
+        submenu: [
+            //{role: 'reload'},
+            {role: 'forcereload'},
+            //{role: 'toggledevtools'},
+            //{type: 'separator'},
+            //{role: 'resetzoom'},
+            //{role: 'zoomin'},
+            //{role: 'zoomout'},
+            //{type: 'separator'},
+            {role: 'togglefullscreen'},
+            {type: 'separator'},
+            {role: 'minimize'}
+        ]
+    },
+    {
+        role: 'help',
+        submenu: [
+            { role: 'about' }
+        ]
+    }
+];
+
+let menu = Menu.buildFromTemplate(menutemplate);
+Menu.setApplicationMenu(menu);
+
+// ------- Other -------
 
 updateGraph();
