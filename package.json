@@ -45,12 +45,6 @@
             "target": "rpm",
             "arch": "ia32"
         }]
-    },
-    "mac": {
-        "target": {
-            "target": "default",
-            "arch": "ia32"
-        }
     }
   }
 }
