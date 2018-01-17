@@ -31,6 +31,7 @@ jobs:
       - save_cache:
           paths:
             - node_modules
+            - ../.cache/electron-builder
           key: v1-dependencies-{{ checksum "package.json" }}
         
       # run tests!
