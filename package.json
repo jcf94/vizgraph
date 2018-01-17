@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dist": "electron-builder -lwm --publish always"
+    "dist": "electron-builder -lw --publish always"
   },
   "author": {
     "name": "Jcf94",
@@ -45,11 +45,6 @@
             "target": "rpm",
             "arch": "ia32"
         }]
-    },
-    "mac": {
-        "target": {
-            "target": "dmg"
-        }
     }
   }
 }
