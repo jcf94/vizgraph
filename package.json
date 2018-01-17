@@ -1,12 +1,12 @@
 {
   "name": "vizgraph",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A simple tool for Using Graphviz.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dist": "electron-builder -lw"
+    "dist": "electron-builder -l"
   },
   "author": {
     "name": "Jcf94",
