@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dist": "electron-builder"
+    "dist": "electron-builder -lw"
   },
   "author": {
     "name": "Jcf94",
@@ -36,6 +36,15 @@
         "arch": "ia32"
       },
       "publisherName": "Jcf94"
+    },
+    "linux": {
+        "target": [{
+            "target": "deb",
+            "arch": "ia32"
+        }, {
+            "target": "rpm",
+            "arch": "ia32"
+        }]
     }
   }
 }

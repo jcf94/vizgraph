@@ -2,6 +2,8 @@
 
 A simple tool for Using [Graphviz](https://graphviz.gitlab.io/). Based on [Viz.js](https://github.com/mdaines/viz.js) & [Electron](https://github.com/electron/electron).
 
+[![CircleCI](https://circleci.com/gh/jcf94/vizgraph.svg?style=svg)](https://circleci.com/gh/jcf94/vizgraph)
+
 Sample usage from [Graphviz Gallery](https://graphviz.gitlab.io/gallery/):
 
 ![](doc/img/exp1.png)
