@@ -33,18 +33,15 @@
     "win": {
       "target": {
         "target": "portable",
-        "arch": "ia32"
+        "arch": ["ia32", "x64"]
       },
       "publisherName": "Jcf94"
     },
     "linux": {
-        "target": [{
-            "target": "deb",
-            "arch": "ia32"
-        }, {
-            "target": "rpm",
-            "arch": "ia32"
-        }]
+        "target": {
+            "target": "AppImage",
+            "arch": ["ia32", "x64"]
+        }
     }
   }
 }

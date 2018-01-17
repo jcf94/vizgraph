@@ -21,13 +21,13 @@ The major framework is based on Electron, so it should be worked on Windows, Mac
 ## For Developers
 
 ```bash
-$ git clone https://github.com/jcf94/vizgraph.git
+git clone https://github.com/jcf94/vizgraph.git
 
-$ cd vizgraph
+cd vizgraph
 
-$ npm install
+npm install
 
-$ npm start
+npm start
 ```
 
 Then start playing it.
@@ -36,6 +36,6 @@ Use [electron-builder](https://github.com/electron-userland/electron-builder) to
 
 ## For Users
 
-Get the latest [release](https://github.com/jcf94/vizgraph/releases). Unzip and it's tiny but useful.
+Get the latest [release](https://github.com/jcf94/vizgraph/releases).
 
-Sorry for only pack for Windows now.
+Now we have portable packages for Windows(.exe) and Most Linux Repositories(.AppImage).
