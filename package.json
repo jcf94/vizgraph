@@ -45,6 +45,11 @@
             "target": "rpm",
             "arch": "ia32"
         }]
+    },
+    "mac": {
+        "target": {
+            "target": "dmg"
+        }
     }
   }
 }
