@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dist": "electron-builder -lm --publish always"
+    "dist": "electron-builder -lw --publish always"
   },
   "author": {
     "name": "Jcf94",
