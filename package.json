@@ -48,6 +48,7 @@
     },
     "mac": {
         "target": {
+            "target": "default",
             "arch": "ia32"
         }
     }
