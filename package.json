@@ -5,19 +5,21 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dist": "electron-builder"
   },
   "author": {
-      "name": "Jcf94",
-      "email": "jcf94@outlook.com"
+    "name": "Jcf94",
+    "email": "jcf94@outlook.com"
   },
   "repository": {
-      "type": "git",
-      "url": "https://github.com/jcf94/vizgraph.git"
+    "type": "git",
+    "url": "https://github.com/jcf94/vizgraph.git"
   },
   "license": "ISC",
   "devDependencies": {
-    "electron": "1.7.10"
+    "electron": "1.7.10",
+    "electron-builder": "^19.53.7"
   },
   "dependencies": {
     "ace-builds": "^1.2.9",
@@ -30,9 +32,9 @@
     "productName": "vizgraph",
     "win": {
       "target": {
-          "target": "portable",
-          "arch": "ia32"
-        },
+        "target": "portable",
+        "arch": "ia32"
+      },
       "publisherName": "Jcf94"
     }
   }
