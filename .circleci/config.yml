@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: electronuserland/builder
+      - image: electronuserland/builder:wine
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -31,7 +31,8 @@ jobs:
       - save_cache:
           paths:
             - node_modules
-            - ../.cache/electron-builder
+            - $HOME/.cache/electron
+            - $HOME/.cache/electron-builder
           key: v1-dependencies-{{ checksum "package.json" }}
         
       # run tests!
