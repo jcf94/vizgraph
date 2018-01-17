@@ -8,11 +8,28 @@ let worker;
 let result;
 let image;
 
-const {Menu, dialog, BrowserWindow} = require('electron').remote;
+const {ipcRenderer, remote} = require('electron');
+const {Menu, dialog, BrowserWindow} = remote;
 let fs = require('fs');
+let mainWindow = remote.getCurrentWindow();
+
+// ------- State Maintain -------
 
 let edit_state = false;
 let current_file = undefined;
+
+let into_edit = () => {
+    edit_state = true;
+    mainWindow.setTitle('VizGraph (*)');
+    ipcRenderer.send('cannot_close');
+}
+
+let into_read = () => {
+    edit_state = false;
+    mainWindow.setTitle('VizGraph');
+    ipcRenderer.send('can_close');
+}
+
 // ------- Split -------
 
 let Split = require('split.js');
@@ -35,9 +52,7 @@ editor.getSession().setMode("ace/mode/dot");
 //editor.execCommand("showSettingsMenu");
 editor.on("change", function() {
     if (!edit_state) {
-        edit_state = true;
-        let window = BrowserWindow.getAllWindows()[0];
-        window.setTitle('VizGraph (*)');
+        into_edit();
     }
     updateGraph();
     beforeUnloadMessage = "Your changes will not be saved.";
@@ -281,7 +296,7 @@ function updateOutput()
     }
 }
 
-// ------- Menu -------
+// ------- Save Dot File -------
 
 let save_dot_to_file = (callback, args) => {
     let dot_text = editor.getSession().getDocument().getValue();
@@ -299,13 +314,10 @@ let save_dot_to_file = (callback, args) => {
                     alert("An error ocurred creating the file "+ err.message);
                     return;
                 }
-                edit_state = false;
-                let window = BrowserWindow.getAllWindows()[0];
-                window.setTitle('VizGraph');
+                into_read();
                 current_file = filename;
+                callback && callback(args);
             });
-
-            callback && callback(args);
     });
 }
 
@@ -320,11 +332,9 @@ let try_to_save_dot_to_file = (callback, args) => {
                     alert("An error ocurred creating the file "+ err.message);
                     return;
                 }
-                edit_state = false;
-                let window = BrowserWindow.getAllWindows()[0];
-                window.setTitle('VizGraph');
+                into_read();
+                callback && callback(args);
             });
-            callback && callback(args);
         }
     }
 }
@@ -341,9 +351,7 @@ let read_file = (filename) => {
             return;
         }
         let dot_text = editor.getSession().getDocument().setValue(data);
-        edit_state = false;
-        let window = BrowserWindow.getAllWindows()[0];
-        window.setTitle('VizGraph');
+        into_read();
     });
 }
 
@@ -397,6 +405,28 @@ document.addEventListener('dragover', (e) => {
     e.preventDefault();
     e.stopPropagation();
 });
+
+ipcRenderer.on('save_dot_file', () => {
+    dialog.showMessageBox({
+        type: "question",
+        message: "VizGraph Exit && Save Current Dot File?",
+        buttons: ["Yes", "No", "Cancel"],
+        title: "Save Dot File"
+    }, (response) => {
+        switch(response) {
+            case 0:
+                try_to_save_dot_to_file(mainWindow.close);
+                break;
+            case 1:
+                ipcRenderer.send('can_close');
+                mainWindow.close();
+            default:
+                return;
+        }
+    });
+});
+
+// ------- Menu -------
 
 let menutemplate = [
     {

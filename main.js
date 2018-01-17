@@ -4,6 +4,7 @@ const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 const Menu = electron.Menu;
+const ipcMain = electron.ipcMain;
 
 const path = require('path')
 const url = require('url')
@@ -11,17 +12,26 @@ const url = require('url')
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+let can_close = true
+
+ipcMain.on('cannot_close', () => {
+    can_close = false;
+});
+
+ipcMain.on('can_close', () => {
+    can_close = true;
+});
 
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 1024, height: 768})
+  mainWindow = new BrowserWindow({width: 1024, height: 768});
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
     slashes: true
-  }))
+  }));
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -31,8 +41,16 @@ function createWindow() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    mainWindow = null
-  })
+    mainWindow = null;
+  });
+
+  mainWindow.on('close', (event) => {
+      if (can_close === false) {
+          mainWindow.webContents.send('save_dot_file');
+          event.preventDefault();
+      }
+  });
+
 }
 
 // This method will be called when Electron has finished
@@ -40,7 +58,7 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.on('ready', function (){
     createWindow();
-})
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
