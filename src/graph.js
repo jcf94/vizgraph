@@ -8,7 +8,7 @@ let result;
 let image;
 
 const {ipcRenderer, remote} = require('electron');
-const {Menu, dialog, BrowserWindow} = remote;
+const {Menu, dialog, BrowserWindow, app} = remote;
 let fs = require('fs');
 let mainWindow = remote.getCurrentWindow();
 
@@ -301,7 +301,7 @@ function updateOutput()
 
 let save_dot_to_file = (callback, args) => {
     let dot_text = editor.getSession().getDocument().getValue();
-    dialog.showSaveDialog({
+    dialog.showSaveDialog(mainWindow, {
         filters: [
             {name: 'Dot Files', extensions: ['dot']},
             {name: 'All Files', extensions: ['*']}
@@ -358,12 +358,14 @@ let read_file = (filename) => {
 
 let read_dot_from_file = (filepath) => {
     if (filepath === undefined) {
-        dialog.showOpenDialog({
+        dialog.showOpenDialog(mainWindow, {
             filters: [
                 {name: 'Dot Files', extensions: ['dot']},
                 {name: 'All Files', extensions: ['*']}
             ]}, (filename) => {
+                if (filename != undefined) {
                     read_file(filename[0]);
+                } 
         });
     } else {
         read_file(filepath);
@@ -372,7 +374,7 @@ let read_dot_from_file = (filepath) => {
 
 let try_to_read_dot_from_file = (filepath) => {
     if (edit_state) {
-        dialog.showMessageBox({
+        dialog.showMessageBox(mainWindow, {
             type: "question",
             message: "Save Current Dot File & Open another?",
             buttons: ["Yes", "No", "Cancel"],
@@ -414,7 +416,7 @@ document.addEventListener('dragover', (e) => {
 });
 
 ipcRenderer.on('save_dot_file', () => {
-    dialog.showMessageBox({
+    dialog.showMessageBox(mainWindow, {
         type: "question",
         message: "VizGraph Exit && Save Current Dot File?",
         buttons: ["Yes", "No", "Cancel"],
@@ -443,7 +445,7 @@ let menutemplate = [
                 label: 'New Dot File',
                 click: () => {
                     if (edit_state) {
-                        dialog.showMessageBox({
+                        dialog.showMessageBox(mainWindow, {
                             type: "question",
                             message: "Save Current Dot File & Start a New Dot File?",
                             buttons: ["Yes", "No", "Cancel"],
@@ -503,7 +505,7 @@ let menutemplate = [
         label: 'View',
         submenu: [
             //{role: 'reload'},
-            //{role: 'forcereload'},
+            {role: 'forcereload'},
             //{role: 'toggledevtools'},
             //{type: 'separator'},
             //{role: 'resetzoom'},
@@ -519,16 +521,26 @@ let menutemplate = [
         role: 'help',
         submenu: [
             {
-                label: 'About',
+                role: 'about',
                 click: () => {
-                    let aboutWindow = new BrowserWindow({width: 400, height: 320});
-                    aboutWindow.loadURL('file://src/about.html');
-                    aboutWindow.show();
+                    open_about_dialog();
                 }
             }
         ]
     }
 ];
+
+let open_about_dialog = () => {
+    dialog.showMessageBox(mainWindow, {
+        title: 'About VizGraph',
+        type: 'info',
+        message: 'VizGraph',
+        detail: 'A simple tool for Using Graphviz. Based on Viz.js & Electron.\n\n' +
+        'App version: Beta ' + app.getVersion()
+    }, () => {
+
+    });
+}
 
 let menu = Menu.buildFromTemplate(menutemplate);
 Menu.setApplicationMenu(menu);
