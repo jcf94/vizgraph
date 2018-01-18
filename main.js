@@ -6,8 +6,9 @@ const BrowserWindow = electron.BrowserWindow
 const Menu = electron.Menu;
 const ipcMain = electron.ipcMain;
 
-const path = require('path')
-const url = require('url')
+const path = require('path');
+const url = require('url');
+const settings = require('electron-settings');
 
 const debug = /--debug/.test(process.argv[2]);
 
@@ -15,6 +16,11 @@ const debug = /--debug/.test(process.argv[2]);
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 let can_close = true
+
+let mainWindow_width = 1024
+let mainWindow_height = 768
+let mainWindow_x
+let mainWindow_y
 
 ipcMain.on('cannot_close', () => {
     can_close = false;
@@ -26,7 +32,7 @@ ipcMain.on('can_close', () => {
 
 function createWindow() {
     // Create the browser window.
-    mainWindow = new BrowserWindow({width: 1024, height: 768});
+    mainWindow = new BrowserWindow({width: mainWindow_width, height: mainWindow_height, icon: 'src/img/app.ico'});
 
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
@@ -52,6 +58,11 @@ function createWindow() {
         if (can_close === false) {
             mainWindow.webContents.send('save_dot_file');
             event.preventDefault();
+        } else {
+            [mainWindow_width, mainWindow_height] = mainWindow.getSize();
+            settings.set('mainWindow_width', mainWindow_width);
+            settings.set('mainWindow_height', mainWindow_height);
+            //mainWindow.webContents.send('save_dot_file');
         }
     });
 }
@@ -59,7 +70,9 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', function (){
+app.on('ready', () => {
+    mainWindow_width = settings.get('mainWindow_width', 1024);
+    mainWindow_height = settings.get('mainWindow_height', 768);
     createWindow();
 });
 

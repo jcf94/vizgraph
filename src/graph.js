@@ -16,6 +16,7 @@ let mainWindow = remote.getCurrentWindow();
 
 let edit_state = false;
 let current_file = undefined;
+const app_version = app.getVersion();
 
 let into_edit = () => {
     edit_state = true;
@@ -41,15 +42,18 @@ let into_read = () => {
 // ------- Split -------
 
 let Split = require('split.js');
-Split(['#editor', '#graph'], {
-    sizes: [40, 60],
+let split_size = 40;
+let split = Split(['#editor', '#graph'], {
+    sizes: [split_size, 100 - split_size],
     onDragEnd: function() {
         let svgOutput = document.getElementById("svg_output");
         if (svgOutput != null) {
-        svgOutput.dispatchEvent(resizeEvent);
+            svgOutput.dispatchEvent(resizeEvent);
         }
     }
 });
+
+console.log(split.getSizes());
 
 // ------- Ace Editor -------
 
@@ -505,13 +509,19 @@ let menutemplate = [
         label: 'View',
         submenu: [
             //{role: 'reload'},
-            {role: 'forcereload'},
+            //{role: 'forcereload'},
             //{role: 'toggledevtools'},
             //{type: 'separator'},
             //{role: 'resetzoom'},
             //{role: 'zoomin'},
             //{role: 'zoomout'},
             //{type: 'separator'},
+            {
+                label: 'Reset Window Size',
+                click: () => {
+                    mainWindow.setSize(1024, 768);
+                }
+            },
             {role: 'togglefullscreen'},
             {type: 'separator'},
             {role: 'minimize'}
@@ -535,8 +545,8 @@ let open_about_dialog = () => {
         title: 'About VizGraph',
         type: 'info',
         message: 'VizGraph',
-        detail: 'A simple tool for Using Graphviz. Based on Viz.js & Electron.\n\n' +
-        'App version: Beta ' + app.getVersion()
+        detail: 'A simple tool for Using Graphviz.\nPowered by Viz.js & Electron.\n\n' +
+        'App version: Beta ' + app_version
     }, () => {
 
     });
