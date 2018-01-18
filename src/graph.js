@@ -1,7 +1,6 @@
 require('svg-pan-zoom');
 let Viz = require('viz.js');
 
-let beforeUnloadMessage = null;
 let resizeEvent = new Event("paneresize");
 let parser = new DOMParser();
 let worker;
@@ -20,13 +19,22 @@ let current_file = undefined;
 
 let into_edit = () => {
     edit_state = true;
-    mainWindow.setTitle('VizGraph (*)');
+    if (current_file === undefined) {
+        mainWindow.setTitle('VizGraph (*)');
+    } else {
+        mainWindow.setTitle('VizGraph - ' + current_file + ' (*)');
+    }
     ipcRenderer.send('cannot_close');
 }
 
 let into_read = () => {
     edit_state = false;
-    mainWindow.setTitle('VizGraph');
+    if (current_file === undefined) {
+        mainWindow.setTitle('VizGraph');
+    } else {
+        mainWindow.setTitle('VizGraph - ' + current_file);
+    }
+    
     ipcRenderer.send('can_close');
 }
 
@@ -46,23 +54,16 @@ Split(['#editor', '#graph'], {
 // ------- Ace Editor -------
 
 let editor = ace.edit("editor");
-//editor.setTheme("ace/theme/monokai");
-//document.getElementById('editor').style.fontSize='20px';
 editor.getSession().setMode("ace/mode/dot");
-//editor.execCommand("showSettingsMenu");
+
 editor.on("change", function() {
     if (!edit_state) {
         into_edit();
     }
     updateGraph();
-    beforeUnloadMessage = "Your changes will not be saved.";
 });
 
 // ------- Listening Action -------
-
-window.addEventListener("beforeunload", function(e) {
-    return beforeUnloadMessage;
-});
 
 document.querySelector("#engine select").addEventListener("change", function() {
     last_engin = document.querySelector("#engine select").value;
@@ -314,8 +315,8 @@ let save_dot_to_file = (callback, args) => {
                     alert("An error ocurred creating the file "+ err.message);
                     return;
                 }
-                into_read();
                 current_file = filename;
+                into_read();
                 callback && callback(args);
             });
     });
@@ -393,6 +394,12 @@ let try_to_read_dot_from_file = (filepath) => {
     }
 }
 
+let create_new_dot_file = () => {
+    editor.getSession().getDocument().setValue('digraph G {\n}');
+    current_file = undefined;
+    into_read();
+}
+
 document.addEventListener('drop', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -432,6 +439,33 @@ let menutemplate = [
     {
         label: 'File',
         submenu: [
+            {
+                label: 'New Dot File',
+                click: () => {
+                    if (edit_state) {
+                        dialog.showMessageBox({
+                            type: "question",
+                            message: "Save Current Dot File & Start a New Dot File?",
+                            buttons: ["Yes", "No", "Cancel"],
+                            title: "Save Dot File"
+                        }, (response) => {
+                            switch(response) {
+                                case 0:
+                                    try_to_save_dot_to_file(create_new_dot_file);
+                                    break;
+                                case 1:
+                                    create_new_dot_file();
+                                    break;
+                                default:
+                                    return;
+                            }
+                        });
+                    } else {
+                        create_new_dot_file();
+                    }
+                }
+            },
+            { type: 'separator' },
             {
                 label: 'Open Dot File',
                 click: () => {
@@ -484,7 +518,14 @@ let menutemplate = [
     {
         role: 'help',
         submenu: [
-            { role: 'about' }
+            {
+                label: 'About',
+                click: () => {
+                    let aboutWindow = new BrowserWindow({width: 400, height: 320});
+                    aboutWindow.loadURL('file://src/about.html');
+                    aboutWindow.show();
+                }
+            }
         ]
     }
 ];

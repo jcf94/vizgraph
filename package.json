@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "dev": "electron . --debug",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dist": "electron-builder -lw --publish always"
   },
@@ -19,7 +20,7 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "1.7.10",
-    "electron-builder": "^19.53.7"
+    "electron-builder": "^19.54.0"
   },
   "dependencies": {
     "ace-builds": "^1.2.9",
@@ -33,15 +34,21 @@
     "win": {
       "target": {
         "target": "portable",
-        "arch": ["ia32", "x64"]
+        "arch": [
+          "ia32",
+          "x64"
+        ]
       },
       "publisherName": "Jcf94"
     },
     "linux": {
-        "target": {
-            "target": "AppImage",
-            "arch": ["ia32", "x64"]
-        }
+      "target": {
+        "target": "AppImage",
+        "arch": [
+          "ia32",
+          "x64"
+        ]
+      }
     }
   }
 }
