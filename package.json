@@ -19,8 +19,8 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "electron": "1.7.10",
-    "electron-builder": "^19.54.0"
+    "electron": "^1.7.11",
+    "electron-builder": "^19.55.2"
   },
   "dependencies": {
     "ace-builds": "^1.2.9",
