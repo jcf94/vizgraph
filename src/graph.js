@@ -440,7 +440,14 @@ ipcRenderer.on('save_dot_file', () => {
 });
 
 ipcRenderer.on('argv', (event, message) => {
-    console.log(message);
+    fs.stat(message, (err, stat) => {
+        if (stat && stat.isFile()) {
+            console.log(message)
+            try_to_read_dot_from_file(message);
+        } else {
+            console.log("Not a file.");
+        }
+    })
 });
 
 // ------- Menu -------

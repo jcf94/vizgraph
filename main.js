@@ -42,7 +42,7 @@ function createWindow() {
     }));
 
     // Open the DevTools.
-    // if (debug)
+    if (debug)
     {
         mainWindow.webContents.openDevTools();
     }
@@ -76,7 +76,8 @@ app.on('ready', () => {
     mainWindow_height = settings.get('mainWindow_height', 768);
     createWindow();
     mainWindow.webContents.on('did-finish-load', () => {
-        mainWindow.webContents.send('argv', process.argv);
+        if (process.argv.length > 1)
+        mainWindow.webContents.send('argv', process.argv[1]);
     });
 });
 
