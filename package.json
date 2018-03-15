@@ -4,7 +4,7 @@
   "description": "A simple tool for Using Graphviz.",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron . \"C:\\Users\\jcf\\Desktop\\graph.dot\"",
     "dev": "electron . --debug",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dist": "electron-builder -lw --publish always",
