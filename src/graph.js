@@ -53,7 +53,7 @@ let split = Split(['#editor', '#graph'], {
     }
 });
 
-console.log(split.getSizes());
+// console.log(split.getSizes());
 
 // ------- Ace Editor -------
 
@@ -437,6 +437,10 @@ ipcRenderer.on('save_dot_file', () => {
                 return;
         }
     });
+});
+
+ipcRenderer.on('argv', (event, message) => {
+    console.log(message);
 });
 
 // ------- Menu -------

@@ -42,7 +42,8 @@ function createWindow() {
     }));
 
     // Open the DevTools.
-    if (debug) {
+    // if (debug)
+    {
         mainWindow.webContents.openDevTools();
     }
 
@@ -74,6 +75,9 @@ app.on('ready', () => {
     mainWindow_width = settings.get('mainWindow_width', 1024);
     mainWindow_height = settings.get('mainWindow_height', 768);
     createWindow();
+    mainWindow.webContents.on('did-finish-load', () => {
+        mainWindow.webContents.send('argv', process.argv);
+    });
 });
 
 // Quit when all windows are closed.
