@@ -233,7 +233,8 @@ function updateGraph()
         src: editor.getSession().getDocument().getValue(),
         options: {
             engine: document.querySelector("#engine select").value,
-            format: document.querySelector("#format select").value
+            format: document.querySelector("#format select").value,
+            totalMemory: 104857600
         }
     };
 
