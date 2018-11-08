@@ -59,6 +59,11 @@ let split = Split(['#editor', '#graph'], {
 
 let editor = ace.edit("editor");
 editor.getSession().setMode("ace/mode/dot");
+editor.setOptions({
+    enableBasicAutocompletion: true, //boolea 或 completer数组,
+    enableLiveAutocompletion: true, //boolean 或 completer数组,
+    enableSnippets: true, // boolean
+});
 
 editor.on("change", function() {
     if (!edit_state) {
