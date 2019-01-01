@@ -1,7 +1,5 @@
 # VizGraph
 
-![](src/img/ico.png)
-
 A simple tool for Using [Graphviz](https://graphviz.gitlab.io/). Based on [Viz.js](https://github.com/mdaines/viz.js) & [Electron](https://github.com/electron/electron).
 
 ---
