@@ -481,49 +481,49 @@ ipcRenderer.on('create_new_dot', (event, message) => {
         into_read();
         break;
     case 1:
-        fs.readFile('src/template/clusters.gv', 'utf-8', (err, data) => {
+        fs.readFile('template/clusters.gv', 'utf-8', (err, data) => {
             editor.getSession().getDocument().setValue(data);
             current_file = undefined;
             into_read();
         });
         break;
     case 2:
-        fs.readFile('src/template/datastruct.gv', 'utf-8', (err, data) => {
+        fs.readFile('template/datastruct.gv', 'utf-8', (err, data) => {
             editor.getSession().getDocument().setValue(data);
             current_file = undefined;
             into_read();
         });
         break;
     case 3:
-        fs.readFile('src/template/fsm.gv', 'utf-8', (err, data) => {
+        fs.readFile('template/fsm.gv', 'utf-8', (err, data) => {
             editor.getSession().getDocument().setValue(data);
             current_file = undefined;
             into_read();
         });
         break;
     case 4:
-        fs.readFile('src/template/familytree.gv', 'utf-8', (err, data) => {
+        fs.readFile('template/familytree.gv', 'utf-8', (err, data) => {
             editor.getSession().getDocument().setValue(data);
             current_file = undefined;
             into_read();
         });
         break;
     case 5:
-        fs.readFile('src/template/lion_share.gv', 'utf-8', (err, data) => {
+        fs.readFile('template/lion_share.gv', 'utf-8', (err, data) => {
             editor.getSession().getDocument().setValue(data);
             current_file = undefined;
             into_read();
         });
         break;
     case 6:
-        fs.readFile('src/template/polygons.gv', 'utf-8', (err, data) => {
+        fs.readFile('template/polygons.gv', 'utf-8', (err, data) => {
             editor.getSession().getDocument().setValue(data);
             current_file = undefined;
             into_read();
         });
         break;
     case 7:
-        fs.readFile('src/template/switch.gv', 'utf-8', (err, data) => {
+        fs.readFile('template/switch.gv', 'utf-8', (err, data) => {
             editor.getSession().getDocument().setValue(data);
             current_file = undefined;
             into_read();

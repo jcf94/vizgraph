@@ -33,6 +33,7 @@
   "build": {
     "appId": "com.jcf94.vizgraph",
     "productName": "vizgraph",
+    "files": ["template/*"],
     "win": {
       "target": {
         "target": "portable",
