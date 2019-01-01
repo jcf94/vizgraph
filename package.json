@@ -1,6 +1,6 @@
 {
   "name": "vizgraph",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A simple tool for Using Graphviz.",
   "main": "main.js",
   "scripts": {
