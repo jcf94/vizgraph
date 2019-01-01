@@ -20,15 +20,15 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "electron": "^3.0.8",
-    "electron-builder": "^20.33.2"
+    "electron": "^4.0.0",
+    "electron-builder": "^20.38.4"
   },
   "dependencies": {
-    "ace-builds": "^1.4.1",
+    "ace-builds": "^1.4.2",
     "electron-settings": "^3.2.0",
-    "split.js": "^1.5.9",
+    "split.js": "^1.5.10",
     "svg-pan-zoom": "^3.6.0",
-    "viz.js": "^2.0.0"
+    "viz.js": "^2.1.2"
   },
   "build": {
     "appId": "com.jcf94.vizgraph",
