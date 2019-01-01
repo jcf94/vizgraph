@@ -225,7 +225,7 @@ function updateGraph()
     document.querySelector("#output").classList.add("working");
     document.querySelector("#output").classList.remove("error");
 
-    worker = new Worker("src/worker.js");
+    worker = new Worker("script/worker.js");
     worker.onmessage = function(e) {
         document.querySelector("#output").classList.remove("working");
         document.querySelector("#output").classList.remove("error");

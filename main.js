@@ -42,7 +42,7 @@ function open_module_select_window() {
         modal: !debug,
         show: false
     });
-    newwin.loadURL(path.join('file:', __dirname, 'new.html'));
+    newwin.loadURL(path.join('file:', __dirname, 'src/template_select.html'));
 
     if (debug) {
         newwin.webContents.openDevTools();
@@ -75,7 +75,7 @@ function createWindow() {
 
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'index.html'),
+        pathname: path.join(__dirname, 'src/index.html'),
         protocol: 'file:',
         slashes: true,
         backgroundColor: '#000000'
