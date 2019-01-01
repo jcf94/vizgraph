@@ -33,7 +33,8 @@
   "build": {
     "appId": "com.jcf94.vizgraph",
     "productName": "vizgraph",
-    "extraFiles": ["template/*"],
+    "extraFiles": ["template/*", "src/img/ico.png"],
+    "icon": "src/img/ico.ico",
     "win": {
       "target": {
         "target": "portable",
@@ -42,8 +43,7 @@
           "x64"
         ]
       },
-      "publisherName": "Jcf94",
-      "icon": "src/img/app.ico"
+      "publisherName": "Jcf94"
     },
     "linux": {
       "target": {

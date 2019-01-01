@@ -638,10 +638,12 @@ let menutemplate = [
     }
 ];
 
+const nativeImage = remote.nativeImage;
+
 let open_about_dialog = () => {
     dialog.showMessageBox(mainWindow, {
         title: 'About VizGraph',
-        type: 'info',
+        icon: nativeImage.createFromPath('src/img/ico.png'),
         message: 'VizGraph',
         detail: 'A simple tool for Using Graphviz.\nPowered by Viz.js & Electron.\n\n' +
         'App version: Beta ' + app_version

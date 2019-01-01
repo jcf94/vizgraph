@@ -71,7 +71,7 @@ ipcMain.on('proxy_create_new_dot', (event, message) => {
 
 function createWindow() {
     // Create the browser window.
-    mainWindow = new BrowserWindow({width: mainWindow_width, height: mainWindow_height, icon: 'src/img/app.ico'});
+    mainWindow = new BrowserWindow({width: mainWindow_width, height: mainWindow_height, icon: 'src/img/ico.png'});
 
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
