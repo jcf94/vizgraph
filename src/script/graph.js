@@ -7,12 +7,10 @@ let worker;
 let result;
 let image;
 
-const {ipcRenderer, remote} = require('electron');
-const {Menu, dialog, BrowserWindow, app} = remote;
+const {ipcRenderer, remote, shell} = require('electron');
+const {Menu, dialog, app} = remote;
 let fs = require('fs');
 let mainWindow = remote.getCurrentWindow();
-
-const path = require('path');
 
 // ------- State Maintain -------
 
@@ -624,6 +622,12 @@ let menutemplate = [
     {
         role: 'help',
         submenu: [
+            {
+                label: 'Help Documentation',
+                click: () => {
+                    shell.openExternal('http://www.graphviz.org/documentation/');
+                }
+            },
             {
                 role: 'about',
                 click: () => {

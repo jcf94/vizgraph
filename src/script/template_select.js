@@ -11,5 +11,5 @@ for (let i=0;i<buttons.length;i++) {
 let extra_link = document.querySelector("a#gallery_link");
 
 extra_link.addEventListener('click', () => {
-    shell.openExternal('http://www.graphviz.org/gallery/')
+    shell.openExternal('http://www.graphviz.org/gallery/');
 });
