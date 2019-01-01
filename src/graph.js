@@ -12,6 +12,8 @@ const {Menu, dialog, BrowserWindow, app} = remote;
 let fs = require('fs');
 let mainWindow = remote.getCurrentWindow();
 
+const path = require('path');
+
 // ------- State Maintain -------
 
 let edit_state = false;
@@ -57,12 +59,28 @@ let split = Split(['#editor', '#graph'], {
 
 // ------- Ace Editor -------
 
+let language_tools = ace.require('ace/ext/language_tools');
 let editor = ace.edit("editor");
 editor.getSession().setMode("ace/mode/dot");
 editor.setOptions({
     enableBasicAutocompletion: true, //boolea 或 completer数组,
     enableLiveAutocompletion: true, //boolean 或 completer数组,
     enableSnippets: true, // boolean
+});
+
+language_tools.addCompleter({
+    getCompletions: function(editor, session, pos, prefix, callback) {
+        callback(null, [
+            // {
+            //     name: "test",
+            //     value: "test",
+            //     caption: "test",
+            //     meta: "test",
+            //     type: "local",
+            //     score: 1000
+            // }
+        ]);
+    }
 });
 
 editor.on("change", function() {
@@ -313,7 +331,7 @@ let save_dot_to_file = (callback, args) => {
     let dot_text = editor.getSession().getDocument().getValue();
     dialog.showSaveDialog(mainWindow, {
         filters: [
-            {name: 'Dot Files', extensions: ['dot']},
+            {name: 'GraphViz Dot Files', extensions: ['gv']},
             {name: 'All Files', extensions: ['*']}
         ]}, (filename) => {
             if (filename === undefined){
@@ -361,7 +379,7 @@ let read_file = (filename) => {
             alert("An error ocurred reading the file :" + err.message);
             return;
         }
-        let dot_text = editor.getSession().getDocument().setValue(data);
+        editor.getSession().getDocument().setValue(data);
         into_read();
     });
 }
@@ -370,7 +388,7 @@ let read_dot_from_file = (filepath) => {
     if (filepath === undefined) {
         dialog.showOpenDialog(mainWindow, {
             filters: [
-                {name: 'Dot Files', extensions: ['dot']},
+                {name: 'GraphViz Dot Files', extensions: ['gv', 'dot']},
                 {name: 'All Files', extensions: ['*']}
             ]}, (filename) => {
                 if (filename != undefined) {
@@ -407,9 +425,7 @@ let try_to_read_dot_from_file = (filepath) => {
 }
 
 let create_new_dot_file = () => {
-    editor.getSession().getDocument().setValue('digraph G {\n}');
-    current_file = undefined;
-    into_read();
+    ipcRenderer.send('open_module_select_window');
 }
 
 document.addEventListener('drop', (e) => {
@@ -452,8 +468,69 @@ ipcRenderer.on('argv', (event, message) => {
             try_to_read_dot_from_file(message);
         } else {
             console.log("Not a file.");
+            ipcRenderer.send('open_module_select_window');
         }
     })
+});
+
+ipcRenderer.on('create_new_dot', (event, message) => {
+    switch (message) {
+    case 0:
+        editor.getSession().getDocument().setValue('digraph G {\n}');
+        current_file = undefined;
+        into_read();
+        break;
+    case 1:
+        fs.readFile('src/template/clusters.gv', 'utf-8', (err, data) => {
+            editor.getSession().getDocument().setValue(data);
+            current_file = undefined;
+            into_read();
+        });
+        break;
+    case 2:
+        fs.readFile('src/template/datastruct.gv', 'utf-8', (err, data) => {
+            editor.getSession().getDocument().setValue(data);
+            current_file = undefined;
+            into_read();
+        });
+        break;
+    case 3:
+        fs.readFile('src/template/fsm.gv', 'utf-8', (err, data) => {
+            editor.getSession().getDocument().setValue(data);
+            current_file = undefined;
+            into_read();
+        });
+        break;
+    case 4:
+        fs.readFile('src/template/familytree.gv', 'utf-8', (err, data) => {
+            editor.getSession().getDocument().setValue(data);
+            current_file = undefined;
+            into_read();
+        });
+        break;
+    case 5:
+        fs.readFile('src/template/lion_share.gv', 'utf-8', (err, data) => {
+            editor.getSession().getDocument().setValue(data);
+            current_file = undefined;
+            into_read();
+        });
+        break;
+    case 6:
+        fs.readFile('src/template/polygons.gv', 'utf-8', (err, data) => {
+            editor.getSession().getDocument().setValue(data);
+            current_file = undefined;
+            into_read();
+        });
+        break;
+    case 7:
+        fs.readFile('src/template/switch.gv', 'utf-8', (err, data) => {
+            editor.getSession().getDocument().setValue(data);
+            current_file = undefined;
+            into_read();
+        });
+        break;
+    }
+    ipcRenderer.send('close_module_select_window');
 });
 
 // ------- Menu -------
@@ -564,9 +641,7 @@ let open_about_dialog = () => {
         message: 'VizGraph',
         detail: 'A simple tool for Using Graphviz.\nPowered by Viz.js & Electron.\n\n' +
         'App version: Beta ' + app_version
-    }, () => {
-
-    });
+    }, () => {});
 }
 
 let menu = Menu.buildFromTemplate(menutemplate);

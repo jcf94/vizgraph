@@ -30,6 +30,45 @@ ipcMain.on('can_close', () => {
     can_close = true;
 });
 
+let newwin;
+
+function open_module_select_window() {
+    newwin = new BrowserWindow({
+        useContentSize: true,
+        resizable: false,
+        fullscreenable: false,
+        frame: false,
+        parent: mainWindow,
+        modal: !debug,
+        show: false
+    });
+    newwin.loadURL(path.join('file:', __dirname, 'new.html'));
+
+    if (debug) {
+        newwin.webContents.openDevTools();
+    }
+
+    newwin.once('ready-to-show', () => {
+        newwin.show();
+    });
+
+    newwin.on('closed', () => {
+        newwin = null
+    });
+}
+
+ipcMain.on('open_module_select_window', () => {
+    open_module_select_window();
+});
+
+ipcMain.on('close_module_select_window', () => {
+    newwin.close();
+});
+
+ipcMain.on('proxy_create_new_dot', (event, message) => {
+    mainWindow.webContents.send('create_new_dot', message);
+});
+
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({width: mainWindow_width, height: mainWindow_height, icon: 'src/img/app.ico'});
@@ -38,12 +77,12 @@ function createWindow() {
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
-        slashes: true
+        slashes: true,
+        backgroundColor: '#000000'
     }));
 
     // Open the DevTools.
-    if (debug)
-    {
+    if (debug) {
         mainWindow.webContents.openDevTools();
     }
 
@@ -76,8 +115,9 @@ app.on('ready', () => {
     mainWindow_height = settings.get('mainWindow_height', 768);
     createWindow();
     mainWindow.webContents.on('did-finish-load', () => {
-        if (process.argv.length > 1)
-        mainWindow.webContents.send('argv', process.argv[1]);
+        if (process.argv.length > 1) 
+            mainWindow.webContents.send('argv', process.argv[1]);
+        else open_module_select_window();
     });
 });
 
@@ -88,7 +128,7 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     app.quit()
   }
-})
+});
 
 app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
