@@ -3,7 +3,6 @@ const electron = require('electron')
 const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
-const Menu = electron.Menu;
 const ipcMain = electron.ipcMain;
 
 const path = require('path');
@@ -71,7 +70,14 @@ ipcMain.on('proxy_create_new_dot', (event, message) => {
 
 function createWindow() {
     // Create the browser window.
-    mainWindow = new BrowserWindow({width: mainWindow_width, height: mainWindow_height, icon: 'src/img/ico.png'});
+    mainWindow = new BrowserWindow({
+        width: mainWindow_width,
+        height: mainWindow_height,
+        icon: 'src/img/ico.png',
+        webPreferences: {
+            nodeIntegrationInWorker: true
+        }
+    });
 
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({

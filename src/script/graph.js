@@ -1,11 +1,10 @@
 require('svg-pan-zoom');
-let Viz = require('viz.js');
 
 let resizeEvent = new Event("paneresize");
 let parser = new DOMParser();
 let worker;
 let result;
-let image;
+let panZoom;
 
 const {ipcRenderer, remote, shell} = require('electron');
 const {Menu, dialog, app} = remote;
@@ -107,13 +106,6 @@ document.querySelector("#format select").addEventListener("change", function() {
 
     if (now_format === "svg") {
         svg_button.style.display = "inline-block";
-        png_button.style.display = "none";
-        json_button.style.display = "none";
-        xdot_button.style.display = "none";
-        plain_button.style.display = "none";
-        ps_button.style.display = "none";
-    } else if (now_format === "png-image-element") {
-        svg_button.style.display = "none";
         png_button.style.display = "inline-block";
         json_button.style.display = "none";
         xdot_button.style.display = "none";
@@ -149,19 +141,8 @@ document.querySelector("#format select").addEventListener("change", function() {
         ps_button.style.display = "inline-block";
     }
 
-    // if (document.querySelector("#format select").value === "svg") {
-    //     document.querySelector("#raw").classList.remove("disabled");
-    //     document.querySelector("#raw input").disabled = false;
-    // } else {
-    //     document.querySelector("#raw").classList.add("disabled");
-    //     document.querySelector("#raw input").disabled = true;
-    // }
     updateGraph();
 });
-
-// document.querySelector("#raw input").addEventListener("change", function() {
-//     updateOutput();
-// });
 
 function download_blod(format) {
     let url = window.URL.createObjectURL(new Blob([result], { "type" : "text\/xml" }));
@@ -183,16 +164,20 @@ svg_button.addEventListener("click", function() {
 });
 
 png_button.addEventListener("click", function() {
-    let pre = document.querySelector("#engine select").value;
 
-    let a = document.createElement("a");
-    document.body.appendChild(a);
-    a.setAttribute("class", "svg-crowbar");
-    a.setAttribute("download", pre + "_graph.png");
-    a.setAttribute("href", image.src);
-    a.style["display"] = "none";
-    a.click();
-    document.body.removeChild(a);
+    svgXmlToImageElement(result, {scale: panZoom.getZoom()}).then((image) => {
+
+        let pre = document.querySelector("#engine select").value;
+
+        let a = document.createElement("a");
+        document.body.appendChild(a);
+        a.setAttribute("class", "svg-crowbar");
+        a.setAttribute("download", pre + "_graph.png");
+        a.setAttribute("href", image.src);
+        a.style["display"] = "none";
+        a.click();
+        document.body.removeChild(a);
+    });
 });
 
 json_button.addEventListener("click", function() {
@@ -213,6 +198,66 @@ ps_button.addEventListener("click", function() {
 
 // ------- Key Function -------
 
+function defaultScale() {
+    if ('devicePixelRatio' in window && window.devicePixelRatio > 1) {
+      return window.devicePixelRatio;
+    } else {
+      return 1;
+    }
+}
+
+function b64EncodeUnicode(str) {
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
+        return String.fromCharCode('0x' + p1);
+    }));
+}
+
+function svgXmlToImageElement(svgXml) {
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$scale = _ref.scale,
+        scale = _ref$scale === undefined ? defaultScale() : _ref$scale,
+        _ref$mimeType = _ref.mimeType,
+        mimeType = _ref$mimeType === undefined ? "image/png" : _ref$mimeType,
+        _ref$quality = _ref.quality,
+        quality = _ref$quality === undefined ? 1 : _ref$quality;
+
+    return new Promise(function (resolve, reject) {
+        var svgImage = new Image();
+
+        svgImage.onload = function () {
+        var canvas = document.createElement('canvas');
+        canvas.width = svgImage.width * scale;
+        canvas.height = svgImage.height * scale;
+
+        var context = canvas.getContext("2d");
+        context.drawImage(svgImage, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(function (blob) {
+            var image = new Image();
+            image.src = URL.createObjectURL(blob);
+            image.width = svgImage.width;
+            image.height = svgImage.height;
+
+            resolve(image);
+        }, mimeType, quality);
+        };
+
+        svgImage.onerror = function (e) {
+        var error;
+
+        if ('error' in e) {
+            error = e.error;
+        } else {
+            error = new Error('Error loading SVG');
+        }
+
+        reject(error);
+        };
+
+        svgImage.src = 'data:image/svg+xml;base64,' + b64EncodeUnicode(svgXml);
+    });
+}
+
 function updateGraph()
 {
     if (worker)
@@ -224,6 +269,7 @@ function updateGraph()
     document.querySelector("#output").classList.remove("error");
 
     worker = new Worker("script/worker.js");
+
     worker.onmessage = function(e) {
         document.querySelector("#output").classList.remove("working");
         document.querySelector("#output").classList.remove("error");
@@ -254,17 +300,9 @@ function updateGraph()
         src: editor.getSession().getDocument().getValue(),
         options: {
             engine: document.querySelector("#engine select").value,
-            format: document.querySelector("#format select").value,
-            totalMemory: 104857600
+            format: document.querySelector("#format select").value
         }
     };
-
-    // Instead of asking for png-image-element directly, which we can't do in a worker,
-    // ask for SVG and convert when updating the output.
-    
-    if (params.options.format == "png-image-element") {
-        params.options.format = "svg";
-    }
 
     worker.postMessage(params);
 }
@@ -312,9 +350,6 @@ function updateOutput()
         window.addEventListener('resize', function(e) {
             panZoom.resize();
         });
-    } else if (document.querySelector("#format select").value == "png-image-element") {
-        image = Viz.svgXmlToPngImageElement(result);
-        graph.appendChild(image);
     } else {
         let text = document.createElement("div");
         text.id = "text";
