@@ -8,7 +8,9 @@
     "dev": "electron . --debug",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dist": "electron-builder -lw --publish always",
-    "win": "electron-builder -w"
+    "win": "electron-builder -w",
+    "linux": "electron-builder -l",
+    "mac": "electron-builder -m"
   },
   "author": {
     "name": "Jcf94",
@@ -33,7 +35,10 @@
   "build": {
     "appId": "com.jcf94.vizgraph",
     "productName": "vizgraph",
-    "extraFiles": ["template/*", "src/img/ico.png"],
+    "extraFiles": [
+      "template/*",
+      "src/img/ico.png"
+    ],
     "win": {
       "target": {
         "target": "portable",
@@ -53,6 +58,9 @@
           "x64"
         ]
       }
+    },
+    "mac": {
+      "icon": "src/img/ico.png"
     }
   }
 }
