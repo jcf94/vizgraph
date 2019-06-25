@@ -1,3 +1,5 @@
+<img src="https://electronjs.org/app-img/vizgraph/vizgraph-icon-128.png">
+
 # VizGraph
 
 A simple tool for Using [Graphviz](https://graphviz.gitlab.io/). Based on [Viz.js](https://github.com/mdaines/viz.js) & [Electron](https://github.com/electron/electron).
